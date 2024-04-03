@@ -10,10 +10,10 @@ public class FireBall : MonoBehaviour
 
     private void Start()
     {
-        if (myPlayer.transform.position.x < 0)
-            fireBallDirection = Vector3.right;
-        else if (myPlayer.transform.position.x > 0)
+        if (myPlayer.transform.localScale.x < 0)
             fireBallDirection = Vector3.left;
+        else if (myPlayer.transform.localScale.x > 0)
+            fireBallDirection = Vector3.right;
     }
 
     // Update is called once per frame
@@ -37,8 +37,25 @@ public class FireBall : MonoBehaviour
                 GetComponent<Animator>().SetBool("Exp", true);
                 speed = 0;
                 Invoke(nameof(DestroyFireBall), 1);
-                collision.gameObject.GetComponent<Animator>().SetBool("Death", true);
-                collision.gameObject.GetComponent<Player>().die = true;
+                if(collision.gameObject.GetComponent<Player>().block == false)
+                {
+                    collision.gameObject.GetComponent<Player>().HealthChange(-10);
+                    if(collision.gameObject.GetComponent<Player>().health <= 0)
+                    {
+                        collision.gameObject.GetComponent<Player>().PlayAnimation("Death");
+                        collision.gameObject.GetComponent<Player>().die = true;
+                    }
+                    else
+                    {
+                        //collision.gameObject.GetComponent<Player>().PlayAnimation("Hurt");
+                        collision.gameObject.GetComponent<Animator>().SetTrigger("Hurt");
+                    }
+                }    
+                else if (collision.gameObject.GetComponent<Player>().block == true)
+                {
+                    collision.gameObject.GetComponent<Player>().HealthChange(-2);
+                    collision.gameObject.GetComponent<Animator>().SetTrigger("BlockHurt");
+                }
             }            
         }
     }
